@@ -26,6 +26,11 @@ io.on('connection', (client)=>{
 		client.emit('userJoined', connectedUsers[i]);
 		}
 
+		let Posts = redisClient.lrange('chatlog', [0, 9],(err, reply)=>{
+			while(reply.length){
+				client.emit('message', reply.pop());
+			}
+		});
 	});
 
 	client.on("sendingMsg", (message)=>{
@@ -54,6 +59,7 @@ io.on('connection', (client)=>{
 
 
 server.listen(1337,()=>{console.log('listening port 1337');});
+
 
 function postingTime(){
 	let time = new Date();
