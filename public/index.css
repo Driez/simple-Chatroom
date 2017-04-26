@@ -1,8 +1,9 @@
+
 * {
 	padding: 0;
 	border: none;
 	margin: 0;
-
+	box-sizing: border-box;
 }
 
 body {
@@ -68,9 +69,6 @@ h1{
 	border-radius: 3px;
 	display:inline-block;
 }
- * {
-	box-sizing: border-box;
- }
 
 
 #sendBtn {
