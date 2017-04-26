@@ -32,6 +32,10 @@ h1{
 	font-size: 20px;
 }
 
+.user{
+	font-size: 16px;
+}
+
 #chatbox {
     text-align:left;
     margin-bottom: 10px;

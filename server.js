@@ -3,24 +3,33 @@ const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 
+
 app.use(express.static(__dirname + "/public"));
 
 app.get('/', (req, res)=>{
 	res.sendFile(__dirname + '/public/index.html');
 });
 
-io.on('connection',(client)=>{
-	console.log("client connected");
+io.on('connection', (client)=>{
+
+
 	client.on("join",(name)=>{
-		client.nickname = name || "Anon";
+		console.log(name);
+		client.nickname = name;
 		const time = postingTime();
 		client.broadcast.emit("message",'['+ time + ']: ' + name + ' has joined the chat');
+		client.broadcast.emit('userJoined', client.nickname);
+		client.emit('userJoined', client.nickname);
 	});
 
-	io.on('messages',(message)=>{
+	client.on("sendingMsg", (message)=>{
 		const time = postingTime();
-		client.broadcast.emit('message', '['+ time + '] ' +client.nickname + ':' + message);
-		client.emit('message','['+ time + '] ' + client.nickname + ':' + message);
+		client.broadcast.emit('message', '['+ time + '] ' + client.nickname + ': ' + message);
+		client.emit('message', '['+ time + '] ' + client.nickname + ': ' + message);
+	});
+
+	client.on('disconnect', ()=>{
+		client.broadcast.emit('userDisconnect', client.nickname);
 	});
 });
 
