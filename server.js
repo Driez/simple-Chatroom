@@ -14,7 +14,6 @@ io.on('connection', (client)=>{
 
 
 	client.on("join",(name)=>{
-		console.log(name);
 		client.nickname = name;
 		const time = postingTime();
 		client.broadcast.emit("message",'['+ time + ']: ' + name + ' has joined the chat');
