@@ -20,11 +20,11 @@ socket.on('userDisconnect', (user)=>{
 });
 
 $('#sendBtn').on("click", ()=>{ 
-	sendMessage();
+	if($('#newMsg').val() !== "") sendMessage();
 });
 
 $('#newMsg').on("keydown",(e)=>{
-	if(e.key == "Enter") sendMessage();
+	if(e.key == "Enter" && $('#newMsg').val() !== "") sendMessage();
 });
 
 function sendMessage(){
