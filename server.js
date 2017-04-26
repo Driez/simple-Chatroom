@@ -112,11 +112,12 @@ function randomNickname(){
 		'Trunk SlamChest',
 		'Whip SlagCheek'
 	];
+
 	let name;
 
-	do
-	name = NAMES[Math.floor(Math.random() * NAMES.length)];
-	while(connectedUsers.length < NAMES.length && connectedUsers.indexOf(name) == -1);
-	
+	do{
+		name = NAMES[Math.floor(Math.random() * NAMES.length)];
+	}while(connectedUsers.indexOf(name) !== -1 );
+
 	return name;
 }
