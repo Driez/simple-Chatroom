@@ -2,7 +2,10 @@ const express = require("express");
 const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
+const redis = require("redis");
+const redisClient = redis.createClient();
 
+let connectedUsers = [];
 
 app.use(express.static(__dirname + "/public"));
 
@@ -12,23 +15,40 @@ app.get('/', (req, res)=>{
 
 io.on('connection', (client)=>{
 
-
 	client.on("join",(name)=>{
 		client.nickname = name;
 		const time = postingTime();
-		client.broadcast.emit("message",'['+ time + ']: ' + name + ' has joined the chat');
+		client.broadcast.emit("message",'['+ time + ']: ' + client.nickname + ' has joined the chat');
 		client.broadcast.emit('userJoined', client.nickname);
-		client.emit('userJoined', client.nickname);
+
+		connectedUsers.push(client.nickname);
+		for(let i = 0; i < connectedUsers.length; i++){
+		client.emit('userJoined', connectedUsers[i]);
+		}
+
 	});
 
 	client.on("sendingMsg", (message)=>{
 		const time = postingTime();
-		client.broadcast.emit('message', '['+ time + '] ' + client.nickname + ': ' + message);
-		client.emit('message', '['+ time + '] ' + client.nickname + ': ' + message);
+		const output = '['+ time + '] ' + client.nickname + ': ' + message;
+		client.broadcast.emit('message', output);
+		client.emit('message', output);
+
+		let date = new Date();
+		date = date.toDateString();
+
+		redisClient.lpush('chatlog', date + " " + output, ()=>{
+			console.log(date + output);
+			redisClient.ltrim('chatlog', [0, 10000]);
+		});
 	});
 
 	client.on('disconnect', ()=>{
 		client.broadcast.emit('userDisconnect', client.nickname);
+		const time = postingTime();
+		client.broadcast.emit("message",'['+ time + ']: ' + client.nickname + ' has disconnected');
+		
+		connectedUsers.splice(connectedUsers.indexOf(client.nickname),1);
 	});
 });
 
