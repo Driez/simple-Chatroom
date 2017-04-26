@@ -5,8 +5,34 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<title>Chatroom</title>
+	<link rel="stylesheet" href="bootstrap-3.3.7-dist/css/bootstrap.css">
+	<link rel="stylesheet" href="index.css">
 </head>
 <body>
-	<p>hello world</p>
+	<div class="container">
+		<div class="row">
+			<h1>Chatroom</h1>
+		</div>
+		<div id="chat" class="row">
+			<div id="users" class="col-md-2 col-md-offset-1">
+				<p>Users</p>
+				<ul class="userList"></ul>
+			</div>
+			<div id="chatbox" class="col-md-7">
+				<ul class="chatlog"></ul>
+			</div>
+		</div>
+		<div class="row">
+			<div id="input" class="col-md-6 col-md-offset-3">
+				<input type="text" id="newMsg">
+			</div>
+			<div id="button-div" class="col-md-1">
+				<input type="button" id="sendBtn" value="send">
+			</div>
+		</div>
+	</div>
+	<script src="jquery-3.2.1.js"></script>
+	<script src="bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+	<script src="socket.io/socket.io.js"></script>
 </body>
 </html>
