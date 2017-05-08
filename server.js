@@ -4,6 +4,7 @@ const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 const redis = require("redis");
 const redisClient = redis.createClient();
+const filter = require('./chatfilters/filters.js');
 
 let connectedUsers = [];
 
@@ -36,17 +37,21 @@ io.on('connection', (client)=>{
 
 	client.on("sendingMsg", (message)=>{
 		const time = postingTime();
-		const output = '['+ time + '] ' + client.nickname + ': ' + message;
-		client.broadcast.emit('message', output);
-		client.emit('message', output);
+		if(filter.badLanguage(message)){
+			const output = '['+ time + '] ' + client.nickname + ': ' + message;
+			client.broadcast.emit('message', output);
+			client.emit('message', output);
 
-		let date = new Date();
-		date = date.toDateString();
+			let date = new Date();
+			date = date.toDateString();
 
-		redisClient.lpush('chatlog', date + " " + output, ()=>{
-			console.log(date + output);
-			redisClient.ltrim('chatlog', [0, 10000]);
-		});
+			redisClient.lpush('chatlog', date + " " + output, ()=>{
+				console.log(date + output);
+				redisClient.ltrim('chatlog', [0, 10000]);
+			});
+		} else{
+			client.emit('message', 'swearing is not allowed');
+		}
 	});
 
 	client.on('disconnect', ()=>{
