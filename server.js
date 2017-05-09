@@ -17,8 +17,12 @@ app.get('/', (req, res)=>{
 io.on('connection', (client)=>{
 
 	client.on("join",(name)=>{
-		
-		client.nickname = name || randomNickname();
+		if(filter.username(name) && !(~connectedUsers.indexOf(name))){
+			client.nickname = name || randomNickname();
+		}else{
+			client.nickname = randomNickname();
+			client.emit('message', 'this Username is taken or against the rules. Random Name has been assigned');
+		}
 		const time = postingTime();
 		client.broadcast.emit("message",'['+ time + ']: ' + client.nickname + ' has joined the chat');
 		client.broadcast.emit('userJoined', client.nickname);
@@ -28,7 +32,7 @@ io.on('connection', (client)=>{
 		client.emit('userJoined', connectedUsers[i]);
 		}
 
-		let Posts = redisClient.lrange('chatlog', [0, 9],(err, reply)=>{
+		const posts = redisClient.lrange('chatlog', [0, 9],(err, reply)=>{
 			while(reply.length){
 				client.emit('message', reply.pop());
 			}

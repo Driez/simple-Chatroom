@@ -2,12 +2,16 @@
 const socket = io.connect('http://localhost:1337');
 
 socket.on('connect', ()=>{
-	$(".chatlog").append("<li>Connected</li>");
 	let nickname = prompt("Enter Nickname:");
+	$(".chatlog").append("<li>Connected</li>");
 	socket.emit("join", nickname);
 });
 
 socket.on('message', (message)=>{
+	const date = new Date();
+	const regExp = new RegExp('^' + date.toDateString() +' ');
+	console.log(message);
+	if(!!message.match(regExp)) message = message.replace(regExp, '');
 	$(".chatlog").append("<li>" + message + "</li>");
 });
 

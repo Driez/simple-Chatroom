@@ -13,8 +13,8 @@ const BADWORDS = ['anal', 'anus', 'arse', 'ass', 'ballsack', 'balls', 'bastard',
 };
 
 let username = function (name){
-	if(badLanguage(name)){
-		return name.match(/admin | superuser | mikemaster | driez /i) ? false : true;
+	if(name && badLanguage(name)){
+		return name.match(/admin|superuser|mikemaster|driez/i) ? false : true;
 	}
 	return false;
 };
