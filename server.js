@@ -4,23 +4,24 @@ const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 const redis = require("redis");
 const redisClient = redis.createClient();
-const filter = require('./chatfilters/filters.js');
+const filter = require('./chatfilters/filters');
+const randomNickname = require('./utils/randomName'); 
 
 let connectedUsers = [];
 
-app.use(express.static(__dirname + "/public"));
+app.use(express.static("public"));
 
 app.get('/', (req, res)=>{
-	res.sendFile(__dirname + '/public/index.html');
+	res.sendFile('public/index.html');
 });
 
 io.on('connection', (client)=>{
 
 	client.on("join",(name)=>{
 		if(filter.username(name) && !(~connectedUsers.indexOf(name))){
-			client.nickname = name || randomNickname();
+			client.nickname = name || randomNickname(connectedUsers);
 		}else{
-			client.nickname = randomNickname();
+			client.nickname = randomNickname(connectedUsers);
 			client.emit('message', 'this Username is taken or against the rules. Random Name has been assigned');
 		}
 		const time = postingTime();
@@ -75,58 +76,4 @@ function postingTime(){
 	let time = new Date();
 	time = time.toTimeString();
 	return time.match(/\d+:\d+:\d+/)[0];
-}
-
-function randomNickname(){
-	const NAMES = [
-		'Beat PunchBeef',
-		'Big, Brave Brick of Meat',
-		'Big McLargeHuge',
-		'Blast HardCheese',
-		'Blast ThickNeck',
-		'Bob Johnson',
-		'Bold BigFlank',
-		'Bolt VanderHuge',
-		'Brick HardMeat',
-		'Buck PlankChest',
-		'Buff DrinkLots',
-		'Buff HardBack',
-		'Butch DeadLift',
-		'Crud BoneMeal',
-		'Crunch ButtSteak',
-		'Dirk HardPec',
-		'Fist RockBone',
-		'Flint IronStag',
-		'Fridge LargeMeat',
-		'Gristle McThornBody',
-		'Hack BlowFist',
-		'Lump BeefBroth',
-		'Punch RockGroin',
-		'Punch Side-Iron',
-		'Punt SpeedChunk',
-		'Reef BlastBody',
-		'Roll Fizzlebeef',
-		'Rip SteakFace',
-		'Slab BulkHead',
-		'Slab SquatThrust',
-		'Slate Fistcrunch',
-		'Slate SlabRock',
-		'Smash LampJaw',
-		'Smoke ManMuscle',
-		'Splint ChestHair',
-		'Stump BeefKnob',
-		'Stump Chunkman',
-		'Thick McRunFast',
-		'Touch RustRod',
-		'Trunk SlamChest',
-		'Whip SlagCheek'
-	];
-
-	let name;
-
-	do{
-		name = NAMES[Math.floor(Math.random() * NAMES.length)];
-	}while(connectedUsers.indexOf(name) !== -1 );
-
-	return name;
 }
